@@ -647,7 +647,7 @@ function Library:CreateTab(Name)
 		TextLabel.Position = UDim2.new(0, 0, 0.5, 0)
 		TextLabel.Size = UDim2.new(0.75, 0, 0.699999988, 0)
 		TextLabel.Font = Enum.Font.GothamBlack
-		TextLabel.Text = "TOGGLE"
+		TextLabel.Text = ToggleText
 		TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		TextLabel.TextScaled = true
 		TextLabel.TextSize = 14.000
