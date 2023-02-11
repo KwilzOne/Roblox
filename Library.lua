@@ -632,9 +632,9 @@ function Library:CreateTab(Name)
 		local ToggleBox = Instance.new("ImageLabel")
 		local ToggleRatio = Instance.new("UIAspectRatioConstraint")
 		
-		ToggleFrame.Name = "Toggle"
+		ToggleFrame.Name = ToggleText
 		ToggleFrame.Parent = TabFrame
-		ToggleFrame.Active = false
+		ToggleFrame.Active = Status
 		ToggleFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		ToggleFrame.BackgroundTransparency = 1.000
 		ToggleFrame.Selectable = false
