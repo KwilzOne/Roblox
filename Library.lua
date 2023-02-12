@@ -112,7 +112,7 @@ if _G.Settings['Intro'] == true then
 	IntroText.Text = _G.Settings['Name']
 	IntroText.TextColor3 = Color3.fromRGB(255, 255, 255)
 	IntroText.TextScaled = true
-	IntroText.TextSize = 14
+	IntroText.TextSize = 11
 	IntroText.TextWrapped = true
 	
 	local Tween = MakeTween(IntroFrame, TweenInfo.new(1.5, Enum.EasingStyle.Sine), {Position = UDim2.new(0.5, 0, 0.5, 0)})
