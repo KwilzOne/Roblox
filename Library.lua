@@ -196,7 +196,7 @@ Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 Icon.BackgroundTransparency = 1.000
 Icon.Position = UDim2.new(0.5, 0, 0.235, 0)
 Icon.Size = UDim2.new(0.7, 0, 0.25, 0)
-Icon.Image = "http://www.roblox.com/asset/?id=12465676844"
+Icon.Image = "http://www.roblox.com/asset/?id=12465726952"
 
 Title.Name = "Title"
 Title.Parent = InfoFrame
