@@ -1,20 +1,13 @@
 --[[ Services ]]--
 
 local bootTime = os.time()
-
-warn("LunarHub // LunarHub is starting!")
-warn("LunarHub // Getting game data...")
-
 local gt = os.time()
 local CurrentGameInfoData = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
-warn("LunarHub // Collected game data! MarketplaceService took " .. os.time() - gt .. " seconds to collect data.")
-
 local LunarHubVersion = "v0.0.5 Alpha"
 local LunarHubUI_URL = "https://github.com/probablYnicKxD/ProjectLunar/blob/main/LunarHub/LunarHub%20Interface%20-%20" .. LunarHubVersion .. ".rbxm?raw=true"
 local UserExecutor = identifyexecutor() or "Unknown"
 if not isfile and delfile and writefile and readfile and listfiles and makefolder and isfolder and setclipboard and (getsynasset or getcustomasset) then
 	warn("LunarHub // " .. UserExecutor .. " is not supported! Please get another executor, or use the recommended executor, Comet 3.")
-
 	local new = Instance.new("Message", game.Workspace)
 	new.Text = "LunarHub // " .. UserExecutor .. " is not supported. Please get another executor, or use the recommended executor, Comet 3."
 	wait(5)
@@ -23,7 +16,6 @@ if not isfile and delfile and writefile and readfile and listfiles and makefolde
 end
 
 --credits to RegularVynixiu for this asset loading stuff lol
-
 local GetAsset = getsynasset or getcustomasset
 local function LoadCustomInstance(url)
 	if url == "" then
@@ -48,12 +40,17 @@ end
 
 game.Players.LocalPlayer.Chatted:Connect(function(msg)
 	if msg ~= "lunar:Destroy()" then return end
+
 	if game.CoreGui:FindFirstChild("ProjectLunar - LunarHub") then
 		game.CoreGui["ProjectLunar - LunarHub"]:Destroy()
 		local cam = game.Workspace.CurrentCamera or game.Workspace.Camera or game.Workspace:FindFirstChildWhichIsA("Camera")
+
 		if cam then cam.FieldOfView = 70 end
+
 		local blur = game.Lighting:FindFirstChild("ProjectLunarBlur")
+
 		if blur then blur:Destroy() end
+
 		warn("LunarHub // Destroyed interface.")
 	end
 end)
@@ -61,13 +58,9 @@ end)
 if game.CoreGui:FindFirstChild("ProjectLunar - LunarHub") then
 	game.CoreGui["ProjectLunar - LunarHub"]:Destroy()
 	local cam = game.Workspace.CurrentCamera or game.Workspace.Camera or game.Workspace:FindFirstChildWhichIsA("Camera")
-
 	if cam then cam.FieldOfView = 70 end
-
 	local blur = game.Lighting:FindFirstChild("ProjectLunarBlur")
-
 	if blur then blur:Destroy() end
-
 	warn("LunarHub // LunarHub automatically destroyed another instance of the interface!")
 end
 
@@ -87,6 +80,7 @@ repeat warn("LunarHub // Waiting for UI elements to load..."); wait(1) until Lun
 warn("LunarHub // UI loaded in " .. os.time() - utime .. " seconds")
 
 local LocalPlayer = game.Players.LocalPlayer
+
 if not game:IsLoaded() then
 	repeat warn("LunarHub // Waiting for game to load..."); wait(2); until game:IsLoaded()
 end
@@ -181,13 +175,10 @@ local LunarHubThemes = {
 
 local function getStatus(id)
 	local owner = 1038671897
-
 	local prealphatester = 2200660682
-
 	if id == owner then
 		return "Project Lunar Developer"
 	end
-
 	if id == prealphatester then
 		return "Project Lunar Pre-Alpha Tester"
 	elseif game.Players:GetPlayerByUserId(id) and game.Players:GetPlayerByUserId(id).OsPlatform == "LunarHub" then
@@ -202,7 +193,6 @@ local function getGameName()
 end
 
 game.Players.LocalPlayer.OsPlatform = "LunarHub"
-
 --[[ UIs ]]--
 
 local Blur = LunarHub:WaitForChild("ProjectLunarBlur")
@@ -454,13 +444,9 @@ UIS.InputBegan:Connect(function(input)
 	end
 end)
 
-notifyUser("Welcome to LunarHub " .. LunarHubVersion .. ", " .. game.Players.LocalPlayer.DisplayName .. "!")
-
 if LunarHubVersion ~= latest then
 	notifyUser("There is a newer version of LunarHub available! Please use the newest release to ensure the best quality script hub.", false)
 end
-
-notifyUser("Please wait while we attempt to load your settings for you.")
 
 local function rejoin()
 	if #game.Players:GetPlayers() <= 1 then
@@ -617,6 +603,18 @@ local function loadcustomscripts(nonoti)
 	if not nonoti then
 		notifyUser("Successfully loaded your custom scripts!", true)
 	end
+end
+
+local function savecustomscripts()
+	if checkFunctions() == false then notifyUser("Failed to save custom scripts // Your executor does not support file saving!", false) return end
+
+	for i, customScr in pairs(CustomScripts) do
+		customScr = https:JSONEncode(customScr)
+
+		local newFile = writefile(CustomFolderName .. "/" .. customScr.Name .. ".txt", customScr)
+	end
+
+	notifyUser("Successfully saved custom scripts!", true)
 end
 
 if checkFunctions() == true then
@@ -1209,6 +1207,251 @@ game.Players.PlayerRemoving:Connect(function()
 	refreshFriendsList()
 end)
 
+--[[ Script list + Searching ]]--
+
+local scriptLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/probablYnicKxD/ProjectLunar/main/LunarHub/ScriptLibrary.lua"))()
+
+local function refreshScriptLibrary()
+	scriptLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/probablYnicKxD/ProjectLunar/main/LunarHub/ScriptLibrary.lua"))()
+	
+	local template = LunarHub.ScriptSearch.List.Template
+
+	for i, scr in pairs(LunarHub.ScriptSearch.List:GetChildren()) do
+		if scr.Name ~= "UIListLayout" and scr.Name ~= "Template" and scr.Name ~= "Placeholder" then
+			scr:Destroy()
+		end
+	end
+
+	for i, libraryScript in pairs(scriptLibrary) do
+		local new = template:Clone()
+		new.Parent = LunarHub.ScriptSearch.List
+		new.Visible = true
+		new.Name = libraryScript.Name
+		new.ScriptName.Text = libraryScript.Name
+		new.ScriptDescription.Text = libraryScript.Description
+		new.ScriptAuthor.Text = "created by " .. libraryScript.Creator
+
+		local scriptTags = new.Tags
+
+		scriptTags.CanvasPosition = Vector2.new(686, 0) --technically makes them visible
+
+		for i, already in pairs(scriptTags:GetChildren()) do
+			if already:IsA("Frame") and already.Name ~= "UIListLayout" and already.Name ~= "Placeholder" then
+				already.Visible = false
+			end
+		end
+
+		for i, tag in pairs(libraryScript.Tags) do
+			local tagInstance = scriptTags:FindFirstChild(tag)
+
+			if tagInstance then
+				tagInstance.Visible = true
+			else
+				print("Invalid tag: " .. tag)
+			end
+		end
+
+		if libraryScript.Universal == true then
+			new.Universal.Visible = true
+			new.LayoutOrder = 999999
+		else
+			new.Universal.Visible = false
+		end
+
+		if libraryScript.KeySys == true then
+			new.KeySystem.Visible = true
+		else
+			new.KeySystem.Visible = false
+		end
+
+		new.Execute.MouseButton1Click:Connect(function()
+			notifyUser("Attempting to execute " .. libraryScript.Name .. "...", true)
+			local success,errMsg = pcall(function()
+				loadstring(libraryScript.LoadstringScript)()
+			end)
+
+			if success then
+				notifyUser("Successfully executed " .. libraryScript.Name .. "!", true)
+			elseif not success and errMsg then
+				notifyUser("Failed to execute " .. libraryScript.Name .. " - Error message shown in Dev Console [F9]", false)
+				warn("LunarHub // Failed to execute " .. libraryScript.Name .. " - Error Message:\n" .. errMsg)
+			end
+		end)
+
+		if #libraryScript.SupportedGames == 1 then
+			new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. libraryScript.SupportedGames[1] .. "&w=150&h=150"
+		elseif #libraryScript.SupportedGames >= 2 then
+			local gameThumbnail = table.find(libraryScript.SupportedGames, game.PlaceId)
+
+			if gameThumbnail then
+				new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. game.PlaceId .. "&w=150&h=150"
+			else
+				local randomThumbnail = math.random(1,#libraryScript.SupportedGames)
+
+				local randomGameID = libraryScript.SupportedGames[randomThumbnail]
+
+				if randomGameID then
+					new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. randomGameID .. "&w=150&h=150"
+				end
+			end
+		elseif #libraryScript.SupportedGames == 0 and libraryScript.Universal == true then
+			new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. game.PlaceId .. "&w=768&h=432"
+		else
+			new.GameThumbnail.Image = ""
+		end
+
+		new.Visible = true
+	end
+end
+
+local function refreshCustomLibrary()
+	loadcustomscripts(true)
+
+	if #CustomScripts == 0 then
+		LunarHub.CustomScripts.NoCustomScripts.Visible = true
+		LunarHub.CustomScripts.NoCustomScriptsDesc.Visible = true
+	else
+		LunarHub.CustomScripts.NoCustomScripts.Visible = false
+		LunarHub.CustomScripts.NoCustomScriptsDesc.Visible = false
+	end
+
+	local template = LunarHub.CustomScripts.List.Template
+
+	for i, scr in pairs(LunarHub.CustomScripts.List:GetChildren()) do
+		if scr.Name ~= "UIListLayout" and scr.Name ~= "Template" and scr.Name ~= "Placeholder" then
+			scr:Destroy()
+		end
+	end
+
+	for i, customScr in pairs(CustomScripts) do
+		local new = template:Clone()
+		new.Name = customScr.Name
+		new.ScriptName.Text = customScr.Name
+		new.ScriptDescription.Text = customScr.Description
+		new.ScriptAuthor.Text = "uploaded/created by you!"
+		new.Parent = LunarHub.CustomScripts.List
+		new.Visible = true
+
+		if customScr.Games == "UNIVERSAL" then
+			new.Universal.Visible = true
+		end
+
+		new.Execute.UIStroke.Color = Color3.fromRGB(0,255,0)
+		new.Execute.BackgroundColor3 = Color3.fromRGB(0,125,0)
+
+		--[[
+		
+		local newstroke = Instance.new("UIStroke")
+		newstroke.Parent = new.Execute
+		newstroke.Color = Color3.fromRGB(0,0,0)
+		newstroke.Thickness = 1
+		
+		]]--
+
+		new.Execute.MouseButton1Click:Connect(function()
+			local success,errMsg = pcall(function()
+				loadstring(customScr.LoadstringScript)()
+			end)
+
+			if success then
+				notifyUser("Successfully executed " .. customScr.Name .. "!", true)
+			elseif not success and errMsg then
+				notifyUser("Failed to execute " .. customScr.Name .. " - Error message shown in Dev Console [F9]", false)
+				warn("LunarHub // Failed to execute custom script: " .. customScr.Name .. " - Error Message:\n" .. errMsg)
+				return
+			end
+		end)
+
+		if customScr.Games == "UNIVERSAL" then
+			new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. game.PlaceId .. "&w=150&h=150"
+		elseif type(customScr.Games) == "table" and #customScr.Games == 1 then
+			new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. customScr.Games[1] .. "&w=150&h=150"
+		elseif type(customScr.Games) == "table" and #customScr.Games >= 2 then
+			local gameThumbnail = table.find(customScr.Games, game.PlaceId)
+
+			if gameThumbnail then
+				new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. game.PlaceId .. "&w=150&h=150"
+			else
+				local randomThumbnail = math.random(1,#customScr.Games)
+
+				local randomGameID = customScr.Games[randomThumbnail]
+
+				if randomGameID then
+					new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. randomGameID .. "&w=150&h=150"
+				end
+			end
+		end
+
+		new.Visible = true
+	end
+end
+
+local function detectBestScriptForGame()
+	local gameID = game.PlaceId
+
+	local possibleScripts = {}
+
+	local scriptsUniversal = false
+
+	local _script = nil
+
+	for i, scr in pairs(scriptLibrary) do
+		if scr.Universal == false and table.find(scr.SupportedGames, gameID) then
+			table.insert(possibleScripts, scr)
+		end
+	end
+
+	if #possibleScripts == 1 then
+		return possibleScripts[1]
+	elseif #possibleScripts == 0 then
+		for i, scr in pairs(scriptLibrary) do
+			if scr.Universal == true then
+				table.insert(possibleScripts, scr)
+				scriptsUniversal = true
+			end
+		end
+	end
+
+	local lockedBestScript
+	local bestScript
+
+	for i, scr in pairs(possibleScripts) do
+		if table.find(scr.SupportedGames, game.PlaceId) or scr.Universal == true then
+			if scr.Tags["PositiveReviews"] and bestScript == nil and not scr.Tags["Patched"] then
+				bestScript = scr
+			elseif scr.Tags["PositiveReviews"] and bestScript ~= nil and not scr.Tags["Patched"] then
+				if scr.Tags["VerifiedScript"] or scr.Tags["VerifiedCreator"] then
+					bestScript = scr
+				elseif scr.Tags["ProjectLunar"] then
+					lockedBestScript = scr
+				end
+			end
+		end
+	end
+
+	if lockedBestScript or bestScript then
+		return lockedBestScript or bestScript
+	else
+		for i, v in pairs(scriptLibrary) do
+			if v.Universal == true then
+				return v	
+			end
+		end
+	end
+
+	return lockedBestScript or bestScript
+end
+
+refreshScriptLibrary()
+
+LunarHub.ScriptSearch.Refresh.Interact.MouseButton1Click:Connect(function()
+	refreshScriptLibrary()
+end)
+
+LunarHub.CustomScripts.Refresh.Interact.MouseButton1Click:Connect(function()
+	refreshCustomLibrary()
+end)
+
 --[[ Searching ]]--
 
 local function searchPlayerlist()
@@ -1278,6 +1521,37 @@ local function searchCustomScripts()
 		LunarHub.CustomScripts.NoScriptsTitle.Visible = false
 		LunarHub.CustomScripts.NoScriptsDesc.Visible = false
 	end
+end
+
+local function makecustomscript(name, desc, games, loadstr)
+	task.spawn(function()
+		games = string.gsub(games, " ", "")
+
+		if games ~= "UNIVERSAL" then
+			games = string.split(games, ",")
+		end
+
+		local newTable = {
+			Name = name,
+			Description = desc,
+			Games = games,
+			LoadstringScript = loadstr,
+		}
+
+		local httpService = game:GetService("HttpService")
+		local _tJSON = httpService:JSONEncode(newTable)
+
+		local newScript = writefile(CustomFolderName .. "/" .. name .. ".txt", _tJSON)
+		table.insert(CustomScripts, newTable)
+
+		notifyUser("Successfully created custom script: " .. name .. "!", true)
+
+		savecustomscripts()
+
+		wait(1)
+
+		refreshCustomLibrary()
+	end)
 end
 
 refreshCustomLibrary()
@@ -1484,6 +1758,58 @@ UIS.InputBegan:Connect(function(input, gp)
 	end
 end)
 
+LunarHub.CustomScriptCreator.CreateScript.Interact.MouseButton1Click:Connect(function()
+	local ui = LunarHub.CustomScriptCreator
+
+	if ui.NameInput.Text == "" then
+		notifyUser("Please enter a name for the custom script!", false)
+		return
+	end
+
+	if ui.GamesInput.Text == "" then
+		notifyUser("Please a valid game list or type 'UNIVERSAL' into the textbox if your script is universal!", false)
+		return
+	end
+
+	if ui.LoadstringInput.Text == "" then
+		notifyUser("Please enter a valid script!", false)
+		return
+	end
+
+	local gms = ui.GamesInput
+
+	if string.upper(gms.Text) == "UNIVERSAL" then
+		gms = "UNIVERSAL"
+	else
+		gms = ui.GamesInput.Text
+	end
+
+	makecustomscript(ui.NameInput.Text, ui.DescInput.Text, gms, ui.LoadstringInput.Text)
+end)
+
+LunarHub.CustomScriptCreator.Cancel.Interact.MouseButton1Click:Connect(function()
+	local ui = LunarHub.CustomScriptCreator
+
+	TS:Create(ui, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1.35,0)}):Play()
+end)
+
+LunarHub.CustomScriptCreator.ViewLibrary.Interact.MouseButton1Click:Connect(function()
+	local ui = LunarHub.CustomScripts
+
+	TS:Create(ui, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,0.5,0)}):Play()
+	TS:Create(LunarHub.CustomScriptCreator, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1.35,0)}):Play()
+
+	ui.Close.MouseButton1Click:Connect(function()
+		TS:Create(ui, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1.5,0)}):Play()
+	end)
+end)
+
+ScriptsUI.Interactions.CustomScripts.Interact.MouseButton1Click:Connect(function()
+	local ui = LunarHub.CustomScriptCreator
+
+	TS:Create(ui, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,0.5,0)}):Play()
+end)
+
 --[[ Settings UI ]]--
 
 if _G.OverrideSettings then
@@ -1628,6 +1954,137 @@ SettingsUI.Close.MouseButton1Click:Connect(function()
 end)
 
 writesettings(getSettings())
+
+--[[ Quick Play ]]--
+
+local quickPlayUI = LunarHub.QuickPlay
+
+local template = quickPlayUI:WaitForChild("List"):WaitForChild("Template")
+template.Visible = false
+
+local quickPlayLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/probablYnicKxD/ProjectLunar/main/LunarHub/QuickPlayGames.lua"))()
+
+local function addGameToList(gm)
+	local new = template:Clone()
+
+	local gminfo = game:GetService("MarketplaceService"):GetProductInfo(gm.GameID)
+
+	new.Parent = quickPlayUI:WaitForChild("List")
+	new.GameName.Text = gminfo.Name
+	new.GameName.TextTruncate = Enum.TextTruncate.AtEnd
+	new.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. gm.GameID .. "&w=768&h=432"
+	new.Visible = true
+	new:WaitForChild("Interact").ZIndex = 2
+	new.GameThumbnail.ZIndex = 1
+	quickPlayUI.Close.ZIndex = 1
+
+	new.Interact.MouseButton1Click:Connect(function()
+		local ui = quickPlayUI.GameInfo
+
+		ui.Close.ZIndex = 99999
+		ui.CanvasPosition = Vector2.new(0,0,0,0)
+		ui.GameName.Text = gminfo.Name
+		ui.GameName.TextTruncate = Enum.TextTruncate.AtEnd
+		ui.GameThumbnail.Image = "rbxthumb://type=GameThumbnail&id=" .. gm.GameID .. "&w=768&h=432"
+		ui.GameCreator.Text = "Created by " .. gm.GameCreator
+		ui.GameDesc.Text = gminfo.Description
+
+		TS:Create(ui, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,0.5,0)}):Play()
+
+		ui.PlayButton.Position = UDim2.new(0.75,0,ui.PlayButton.Position.Y.Scale,ui.PlayButton.Position.Y.Offset)
+
+		ui.PlayButton.MouseButton1Click:Connect(function()
+			notifyUser("Attempting to join " .. gm.Name .. "...", true)
+
+			local success, errMsg = pcall(function()
+				game:GetService('TeleportService'):Teleport(gm.GameID, game.Players.LocalPlayer)
+			end)
+
+			if not success and errMsg then
+				notifyUser("Failed to join " .. gm.Name .. " - Error message shown in Dev Console [F9]", false)
+				warn("LunarHub // Failed to join " .. gm.Name .. " - Error Message:\n" .. errMsg)
+			end
+		end)
+
+		ui.Close.MouseButton1Click:Connect(function()
+			TS:Create(ui, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,-0.5,0)}):Play()
+		end)
+	end)
+
+	local list = quickPlayUI:WaitForChild("List")
+
+	list.CanvasSize = UDim2.new(0,list.CanvasSize.X.Offset + 412.5,0,0)
+end
+
+local scropen
+local tskopen
+
+local function openQuickPlay()
+	if LunarHub.Scripts.Position == UDim2.new(0.5,0,1,-90) then
+		scropen = true
+	else
+		scropen = false
+	end
+
+	if LunarHub.Taskbar.Position == UDim2.new(0.5,0,1,-12) then
+		tskopen = true
+	else
+		tskopen = false
+	end
+
+	TS:Create(LunarHub.Scripts, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1.6,-90)}):Play()
+	TS:Create(LunarHub.Taskbar, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1.2,-12)}):Play()
+
+	TS:Create(LunarHub.DarkBG, SecondaryTweenInfo, {BackgroundTransparency = 0.7}):Play()
+	TS:Create(quickPlayUI, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,0.5,0)}):Play()
+
+	inBlur()
+end
+
+local function closeQuickPlay()
+	if scropen then
+		TS:Create(LunarHub.Scripts, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1,-90)}):Play()
+	end
+
+	if tskopen then
+		TS:Create(LunarHub.Taskbar, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1,-12)}):Play()
+	end
+
+	TS:Create(LunarHub.DarkBG, SecondaryTweenInfo, {BackgroundTransparency = 1}):Play()
+	TS:Create(quickPlayUI, SecondaryTweenInfo, {Position = UDim2.new(-0.5,0,0.5,0)}):Play()
+
+	outDeBlur()
+end
+
+local function toggleQuickPlay()
+	if quickPlayUI.Position == UDim2.new(0.5,0,0.5,0) then
+		closeQuickPlay()
+	else
+		openQuickPlay()
+	end
+end
+
+local function refreshQuickPlay()
+	for i, already in pairs(quickPlayUI.List:GetChildren()) do
+		if already.Name ~= "UIListLayout" and already.Name ~= "Placeholder" and already.Name ~= "Template" then
+			already:Destroy()
+		end
+	end
+
+	for i, LunarHubGame in pairs(quickPlayLibrary.Games) do
+		addGameToList(LunarHubGame)
+	end
+end
+
+refreshQuickPlay()
+
+TaskbarUI.Buttons.QuickPlay.Interact.MouseButton1Click:Connect(function()
+	openQuickPlay()
+end)
+
+quickPlayUI.Close.MouseButton1Click:Connect(function()
+	closeQuickPlay()
+end)
 
 --[[ Join Codes ]]--
 
@@ -2571,141 +3028,6 @@ LunarHub:WaitForChild("Home"):WaitForChild("Shutdown"):WaitForChild("Interact").
 	LunarHub:Destroy()
 
 	return
-end)
-
---[[ executor system ]]--
-
-notifyUser("Loading LunarExecutor...", true)
-
-local LunarExecutorAPI = game:HttpGet("https://raw.githubusercontent.com/probablYnicKxD/ProjectLunar/main/LunarHub/LunarExecutor/API.lua")
-
-local exec = LunarHub:WaitForChild("Executor")
-
---NOTICE! this monaco was NOT made by me/probablYnicK!
-
-local monaco = loadstring(game:HttpGet("https://raw.githubusercontent.com/probablYnicKxD/ProjectLunar/main/LunarHub/LunarExecutor/Monaco/main.lua"))()
-monaco = monaco.new(exec:WaitForChild("Editor", 20))
-
-monaco:SetText("--LunarExecutor functions by probablYnicK \n --Monaco/Syntax Highlighting made by sleitnick and bread!")
-
-UIS.InputBegan:Connect(function(input)
-	if UIS:IsKeyDown(Enum.KeyCode.LeftControl) and input.KeyCode == Enum.KeyCode.Q then
-		exec.Visible = not exec.Visible
-	end
-end)
-
-exec:WaitForChild("Clear").MouseButton1Click:Connect(function()
-	monaco:SetText("")
-end)
-
-local openfile = exec.Clear:Clone()
-openfile.Position = UDim2.new(exec.Clear.Position.X.Scale, exec.Clear.Position.X.Offset + (exec.Clear.Position.X.Offset - exec.Execute.Position.X.Offset), exec.Clear.Position.Y.Scale, exec.Clear.Position.Y.Offset)
-openfile.Text = "OPEN FILE"
-openfile.MouseButton1Click:Connect(function()
-	local prompt = LunarHub:WaitForChild("OpenFile", 2)
-	local otherprompt = LunarHub:WaitForChild("SaveFile", 2)
-
-	if prompt then
-		TS:Create(prompt, SecondaryTweenInfo, {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
-		TS:Create(otherprompt, SecondaryTweenInfo, {Position = UDim2.new(0.5, 0, 1.5, 0)}):Play()
-	else
-		notifyUser("Failed to open Open File prompt!", false)
-	end
-end)
-openfile.Parent = exec
-
-local savefile = openfile:Clone()
-savefile.Position = UDim2.new(openfile.Position.X.Scale, openfile.Position.X.Offset + (exec.Clear.Position.X.Offset - exec.Execute.Position.X.Offset), openfile.Position.Y.Scale, openfile.Position.Y.Offset)
-savefile.Text = "SAVE FILE"
-savefile.MouseButton1Click:Connect(function()
-	if not isfolder("LunarExecutor Saved Scripts") then makefolder("LunarExecutor Saved Scripts") end
-
-	local prompt = LunarHub:WaitForChild("SaveFile", 2)
-	local otherprompt = LunarHub:WaitForChild("OpenFile", 2)
-
-	if prompt then
-		TS:Create(prompt, SecondaryTweenInfo, {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
-		TS:Create(otherprompt, SecondaryTweenInfo, {Position = UDim2.new(0.5, 0, 1.5, 0)}):Play()
-	else
-		notifyUser("Failed to open Save File prompt!", false)
-	end
-end)
-savefile.Parent = exec
-
-exec:WaitForChild("Execute").MouseButton1Click:Connect(function()
-	local success, err = pcall(function()
-		loadstring(LunarExecutorAPI .. "; " .. monaco:GetText())()
-	end)
-
-	if success then
-		notifyUser("Successfully executed script from LunarExecutor!", true)
-	elseif not success and err then
-		notifyUser("Failed to execute script from LunarExecutor - Error message shown in Dev Console [F9]!", false)
-		error("LunarExecutor - Failed to execute script - Error Message:\n" .. err)
-	end
-end)
-
-exec:WaitForChild("Close").MouseButton1Click:Connect(function()
-	exec.Visible = false
-end)
-
-TaskbarUI:WaitForChild("Buttons"):WaitForChild("Executor"):WaitForChild("Interact").MouseButton1Click:Connect(function()
-	exec.Position = UDim2.new(0.5,0,0.5,0)
-	exec.Visible = not exec.Visible
-end)
-
---[[ save and open file ]]--
-
-local sfprompt = LunarHub:WaitForChild("SaveFile", 20)
-local ofprompt = LunarHub:WaitForChild("OpenFile", 20)
-
-sfprompt:WaitForChild("Layer"):WaitForChild("Save").MouseButton1Click:Connect(function()
-	local savefilenameinput = sfprompt.Layer.Input
-
-	if savefilenameinput.Text == "" then
-		notifyUser("You must input a file name!", false)
-		return
-	end
-
-	writefile("LunarExecutor Saved Scripts/" .. savefilenameinput.Text, monaco:GetText())
-	notifyUser("Saved script to " .. UserExecutor .. "/workspace/LunarExecutor Saved Scripts/" .. savefilenameinput.Text .. "!", true)
-end)
-
-sfprompt:WaitForChild("Layer"):WaitForChild("Close").MouseButton1Click:Connect(function()
-	TS:Create(sfprompt, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1.5,0)}):Play()
-end)
-
-ofprompt:WaitForChild("Layer"):WaitForChild("Close").MouseButton1Click:Connect(function()
-	TS:Create(ofprompt, SecondaryTweenInfo, {Position = UDim2.new(0.5,0,1.5,0)}):Play()
-end)
-
-ofprompt:WaitForChild("Layer"):WaitForChild("Open").MouseButton1Click:Connect(function()
-	local openfilenameinput = ofprompt.Layer.Input
-
-	if openfilenameinput.Text == "" then
-		notifyUser("You must input a file name!", false)
-		return
-	end
-
-	local filefound = isfile(openfilenameinput.Text)
-	if not filefound then
-		notifyUser("Failed to open file - Could not find " .. openfilenameinput.Text .. " in your executor's workspace folder!", false)
-		return
-	else
-		local filecontents = readfile(openfilenameinput.Text)
-		if filecontents then
-			local s, e = pcall(function()
-				monaco:SetText(tostring(filecontents))
-			end)
-
-			if s then
-				notifyUser("Successfully opened " .. openfilenameinput.Text .. "!", true)
-			elseif not s and e then
-				notifyUser("Failed to open " .. openfilenameinput.Text .. " - Error Message shown in Dev Console [F9]", false)
-				warn("LunarHub - LunarExecutor // Failed to open " .. openfilenameinput.Text .. " - Error Message:\n" .. e)
-			end
-		end
-	end
 end)
 
 --[[ Dragging ]]--
